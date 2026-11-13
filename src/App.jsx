@@ -8,17 +8,19 @@ function App() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedColors, setSelectedColors] = useState({});
+  const [selectedSizes, setSelectedSizes] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
 
-  const categories = [
-    "All",
-    "Bridal Jewellery",
-    "chokar",
-    "Earrings",
-    "Bracelets",
-    "Rings",
-  ];
+   const categories = [
+  "All",
+  "Bridal Jewellery",
+  "Necklaces",
+  "Earrings",
+  "Bracelets",
+  "Rings",
+  "Bangles",
+];
 
   const money = (amount) =>
     new Intl.NumberFormat("en-PK", {
@@ -39,43 +41,50 @@ function App() {
   });
 
   const addToCart = (product) => {
-    const color = selectedColors[product.id] || "";
+  const color = selectedColors[product.id] || "";
+  const size = selectedSizes[product.id] || "";
 
-    if (product.colors?.length && !color) {
-      alert("Please select a colour first.");
-      return;
-    }
+  if (product.colors?.length && !color) {
+    alert("Please select a colour first.");
+    return;
+  }
 
-    const cartKey = `${product.id}-${color}`;
+  if (product.sizes?.length && !size) {
+    alert("Please select a size first.");
+    return;
+  }
 
-    setCart((previous) => {
-      const existing = previous.find(
-        (item) => item.cartKey === cartKey
+  const cartKey = `${product.id}-${color}-${size}`;
+
+  setCart((previous) => {
+    const existing = previous.find(
+      (item) => item.cartKey === cartKey
+    );
+
+    if (existing) {
+      return previous.map((item) =>
+        item.cartKey === cartKey
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       );
+          }
 
-      if (existing) {
-        return previous.map((item) =>
-          item.cartKey === cartKey
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
+    return [
+      ...previous,
+      {
+        ...product,
+        cartKey,
+        selectedColor: color,
+        selectedSize: size,
+        quantity: 1,
+      },
+    ];
+  });
 
-      return [
-        ...previous,
-        {
-          ...product,
-          cartKey,
-          selectedColor: color,
-          quantity: 1,
-        },
-      ];
-    });
-
-    setSelectedProduct(null);
-    setCartOpen(true);
-  };
-
+  setSelectedProduct(null);
+  setCartOpen(true);
+};
+    
   const updateQuantity = (cartKey, amount) => {
     setCart((previous) =>
       previous
@@ -124,11 +133,11 @@ function App() {
       .join("\n");
 
     const message =
-      `Assalam-o-Alaikum! I would like to order from Integral Jewels.\n\n` +
+      `Assalam-o-Alaikum! I would like to order from Zevora Jewels.\n\n` +
       `${orderLines}\n\nTotal: ${money(cartTotal)}\n\n` +
       "Please confirm availability and delivery charges.";
 
-    const whatsappNumber = "923234448011";
+    const whatsappNumber = "92 309 7445457";
 
     if (!whatsappNumber) {
       alert("WhatsApp ordering will be available soon.");
@@ -152,9 +161,9 @@ function App() {
 
       <header className="navbar">
         <a href="#home" className="brand">
-          <span className="brand-symbol">✧</span>
+          <span className="brand-symbol">✦</span>
           <span className="brand-name">
-            INTEGRAL
+            ZEVORA
             <small>J E W E L S</small>
           </span>
         </a>
@@ -219,8 +228,8 @@ function App() {
             <div className="hero-art-inner">
               <span className="hero-sparkle sparkle-one">✧</span>
               <span className="hero-sparkle sparkle-two">✦</span>
-              <div className="hero-monogram">I</div>
-              <p>THE INTEGRAL COLLECTION</p>
+              <div className="hero-monogram">Z</div>
+              <p>THE ZEVORA COLLECTION</p>
             </div>
 
             <span className="hero-art-caption">
@@ -395,6 +404,26 @@ function App() {
                         ))}
                       </select>
                     )}
+                    {product.sizes?.length > 0 && (
+  <select
+    className="color-select"
+    value={selectedSizes[product.id] || ""}
+    onChange={(event) =>
+      setSelectedSizes((previous) => ({
+        ...previous,
+        [product.id]: event.target.value,
+      }))
+    }
+    aria-label={`Choose size for ${product.name}`}
+  >
+    <option value="">Choose a size</option>
+    {product.sizes.map((size) => (
+      <option key={size} value={size}>
+        {size}
+      </option>
+    ))}
+  </select>
+)}
 
                     {product.id === 2 &&
                       selectedColors[product.id] && (
@@ -405,6 +434,15 @@ function App() {
                           />
                         </div>
                       )}
+                      {product.id === 21 &&
+  selectedColors[product.id] === "Golden" && (
+    <div className="choker-colour-preview">
+      <img
+        src="/images/star-pendant-golden.png"
+        alt="Star Pendant Necklace in Golden Colour"
+      />
+    </div>
+  )}
 
                     <button
                       className="add-cart-button"
@@ -439,7 +477,7 @@ function App() {
 
         <section className="story-section" id="about">
           <div className="story-symbol">
-            I<span>✧</span>
+            Z<span>✧</span>
           </div>
 
           <div className="story-content">
@@ -450,7 +488,7 @@ function App() {
             </h2>
 
             <p>
-              At Integral Jewels, we believe the right piece can make
+              At Zevora Jewels, we believe the right piece can make
               an ordinary day feel special. Explore our growing
               collection of carefully selected designs for
               celebrations, gifting and everyday elegance.
@@ -500,13 +538,13 @@ function App() {
               <div>
                 <h3>Chat With Us</h3>
                 <p>We're just a message away.</p>
-                <strong>+92 323 4448011</strong>
+                <strong>+92 309 7445457</strong>
               </div>
             </div>
 
             <a
               className="contact-whatsapp-button"
-              href="https://wa.me/923234448011"
+              href="https://wa.me/+92 309 7445457"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -514,7 +552,13 @@ function App() {
             </a>
 
             <p className="contact-note">
-              Instagram coming soon ♡
+              <a
+  href="https://www.instagram.com/integral_jewellery/"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Instagram
+</a>
             </p>
           </div>
         </section>
@@ -525,7 +569,7 @@ function App() {
           <span className="brand-symbol">✧</span>
 
           <span className="brand-name">
-            INTEGRAL
+            ZEVORA
             <small>J E W E L S</small>
           </span>
         </a>
@@ -547,7 +591,7 @@ function App() {
 
         <div className="footer-bottom">
           <span>
-            © {new Date().getFullYear()} Integral Jewels
+            © {new Date().getFullYear()} ZEVORA Jewels
           </span>
           <span>Made with care ♡</span>
         </div>
